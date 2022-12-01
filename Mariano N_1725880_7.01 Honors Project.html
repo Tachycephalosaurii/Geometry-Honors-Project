@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Geometry Honors Project</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+    integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .column {
+      float: left;
+      width: 33.33%;
+      padding: 10px;
+    }
+
+    .row {
+      text-align: center;
+    }
+
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    li {
+      margin-top: 20px;
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    ol>em {
+      position: relative;
+      left: 1%;
+    }
+
+    canvas {
+      outline: 0.5px solid grey;
+    }
+
+    #colors {
+      text-align: center;
+    }
+
+    .color-picker-container {
+      position: relative;
+      float: left;
+      left: 25%;
+      padding-left: 0.625%;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Budding Regular Tessellation (Geometry Honors Project)</h1>
+  <h2>Website by Nathan Mariano (1725880)</h2>
+  <div class='row'>
+    <div class="column">
+      <h3>Polygon Construction</h3>
+      <canvas id="shape" width="300px" height="300px"></canvas>
+      <div class="slider">
+        Radius(R):
+        <input type="range" min="25" max="100" value="50" id="radius">
+        <span></span>px
+      </div>
+
+      <div class="slider">
+        Sides(s):
+        <input type="range" min="3" max="8" value="6" id="sides">
+        <span></span>
+      </div>
+    </div>
+    <div class="column">
+      <h3>Translation on the Linear Bisection</h3>
+      <canvas id="perp" width="300px" height="300px"></canvas>
+      <br>
+      <em>Note: for the purposes of this example above, the displacement is not the distance from the side to the center
+        of the shape, but rather the length of the side.</em>
+    </div>
+    <div class="column">
+      <h3>Perlin Noise Coloring</h3>
+      <canvas id="perli" width="300px" height="300px"></canvas>
+      <div id='colors'>
+        <div class="color-picker-container">
+          <input class="color-picker-field primary-color-picker" type="color" value="#aee5c3">
+        </div>
+        <div class="color-picker-container">
+          <input class="color-picker-field primary-color-picker" type="color" value="#aeb4e5">
+        </div>
+        <div class="color-picker-container">
+          <input class="color-picker-field primary-color-picker" type="color" value="#e5aec8">
+        </div>
+        <div class="color-picker-container">
+          <input class="color-picker-field primary-color-picker" type="color" value="#e5d8ae">
+        </div>
+        <div class="color-picker-container">
+          <input class="color-picker-field primary-color-picker" type="color" value="#e5c3ae">
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="center">
+    <h1>Result</h1>
+    <canvas id="env" width="1000px" height="600px"></canvas>
+  </div>
+  <br><br>
+  <h5>&copy;2022 Nathan Mariano<br>All 500+ lines of code was written from scratch within Visual Studio Code.</h5>
+  <hr>
+  <ol>
+    <li>What is a tessellation, and how are transformations used to create a tessellation?</li>
+    <em>A tessellation is an pattern of shapes that do not overlap or contain gaps. Only rigid transformations like
+      reflections, translations and rotations can create these types of patterns. In this example, I used an outwards
+      translation then a 180&#176; rotation to place each shape.</em>
+    <li>Which regular polygons tessellate? (List all.)</li>
+    <em>As you can see by the simulation, the only regular polygons that tessellate are the triangle, square and
+      hexagon.</em>
+    <li>Consider your answer to Question 2. Why do these regular polygons tessellate while other regular polygons do
+      not? Include a discussion of interior angles in your response. Also include an example of a regular polygon that
+      would not tessellate and explain why it would not.</li>
+    <em>
+      For a polygon to tessellate, it must not overlap or create gaps. In the case of the pentagon, it creates gaps as
+      it repeats. (p.s. those overlapping bits are just the edge-detection bugging out)
+      <br>
+      If you find a point where the interior angles of each shape share a point, those interior angles will add up to
+      360&#176;. If it is less than 360&#176;, it will create a gap.
+      <br>
+      The octagon does not create any gaps, however it will overlap other octagons in the pattern. This is because the
+      interior angles of octagons that share a point exceed 360&#176;.
+      <br>
+      But when you look at the hexagon, it creates a perfect tessellation. This is because every point/vertex is shared
+      by 3 other hexagons and their interior angles add up to 360&#176;.
+    </em>
+    <li>Using your geometry software, create a regular tessellation. You may use color patterns to make the
+      tessellation more visually interesting. Make a screenshot of your tessellation and paste it into this assignment.
+      In the space provided below, write a detailed explanation of the steps you followed to create your tessellation.
+      A model worksheet and response have been provided for you. If you choose to tessellate the same regular
+      polygon as the example provided, you must use different transformations from those used in the model.</li>
+    <strong>Simple explanation:</strong><br>
+    <em>
+
+      First, create the shape using polar coordinates around the center point.<br>
+      With the shape done, take a side (we'll iterate through each one) and find the linear bisection of it.<br>
+      On the axis of the linear bisection, translate outwards by the distance between where the bisection meets the side
+      segment and the center of the shape. This is the smallest radius on the shape.<br>
+      Finally, invert the shape horizontally by rotating it 180&#176;.<br>
+      Repeat for each side.<br>
+
+    </em>
+    <strong>Technical explanation?:</strong><br>
+    <em>
+      center of shape (<strong>c</strong>): (0, 0)
+      midpoint of side(<strong>m</strong>): ((x<sub>1</sub>+x<sub>2</sub>)/2, (y<sub>1</sub>+y<sub>2</sub>)/2)<br>
+      angle towards v<sub>2</sub> from v<sub>1</sub> (<strong>a</strong>): atan2(y<sub>1</sub>-y<sub>2</sub>,
+      x<sub>1</sub>-x<sub>2</sub>)<br>
+      perpendicular angle (<strong>θ</strong>): a + HALF_PI<Br>
+      vector representing the bisection (<strong>P</strong>): (cosθ, sinθ)<Br>
+      magnitude of the desired displacement (<strong>R</strong>): √( (m<sub>x</sub> - c<sub>x</sub>)<sup>2</sup> +
+      (m<sub>y</sub> - c<sub>y</sub>)<sup>2</sup> )
+      <br>
+      <br>
+      (x, y) --> (x + P<sub>x</sub> ⋅ R, y + P<sub>y</sub> ⋅ R) --> (x, -y)<br>
+      Note: the second transformation is incorrect, but I currently can't wrap my head around how to write a reflection
+      about a point (or the movement of the origin).
+    </em>
+  </ol>
+  <script>
+    var frameCount = 0;
+    function fill(r, g, b, a) {
+      ctx.fillStyle = a ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`;
+    }
+    function stroke(r, g, b, a) {
+      ctx.strokeStyle = a ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`;
+    }
+
+    var toRad = (degrees) => degrees * (Math.PI / 180);
+    var toDeg = (radians) => radians * (180 / Math.PI);
+    var cos = (degrees) => Math.cos(toRad(degrees));
+    var sin = (degrees) => Math.sin(toRad(degrees));
+    var dist = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    function polygon(x, y, radius, sides, theta) {
+      let poly = [];
+      for (let i = 0; i < sides; i++) {
+        let X = cos((i * 360 / sides) + theta) * radius;
+        let Y = sin((i * 360 / sides) + theta) * radius;
+        poly[i] = { x: x + X, y: y + Y };
+      }
+      return poly;
+    }
+    function shape(pnts, ctx) {
+      ctx.beginPath();
+      ctx.moveTo(pnts[0].x, pnts[0].y);
+      for (var i = 1; i < pnts.length; i++) {
+        ctx.lineTo(pnts[i].x, pnts[i].y);
+      }
+      ctx.closePath();
+    }
+
+    function mouse(canvas, evt) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
+  </script>
+
+  <!-- Simple Shape Example -->
+  <script>
+    console.clear();
+    var shp = document.getElementById('shape');
+    let mouseIsPressed = false;
+    $(shp).mousedown(() => mouseIsPressed = true).mouseup(() => mouseIsPressed = false);
+
+    var rad = $('#radius')[0];
+    var sid = $('#sides')[0];
+    var radius, sides, poly;
+    var rot = 0;
+    function updateShape() {
+      radius = rad.value;
+      sides = sid.value;
+      let inc = 360 / sides;
+      if (!mouseIsPressed) {
+        let target = (inc * (sides - 1) - 90);
+        if (rot - target < rot - (target + 360)) target += 360;
+        while (rot > 360) { rot -= 360; }
+        rot += (target - rot) * 0.1; //interpolation
+      } else rot += 4;
+
+      let ctx = shp.getContext('2d');
+      ctx.clearRect(0, 0, shp.width, shp.height);
+
+      //center and rotate the shape
+      ctx.translate(shp.width / 2, shp.height / 2);
+
+      //draw polygon
+      let example = polygon(0, 0, radius, sides, rot);
+      shape(example, ctx);
+      //coloring
+      ctx.strokeStyle = 'blue';
+      ctx.fillStyle = 'transparent';
+      ctx.stroke();
+      ctx.fill();
+      //reset matrix
+      ctx.resetTransform();
+
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      ctx.font = "10px Lucida Console";
+      if (mouseIsPressed) {
+        let v = ((rot % 360) > 180 ? -1 : 1) * (radius * (15 / 50));
+        ctx.fillText(`(${~~example[0].x}, ${~~example[0].y})`, shp.width / 2 + example[0].x, shp.height / 2 + example[0].y + v);
+        ctx.beginPath();
+        ctx.arc(shp.width / 2 + example[0].x, shp.height / 2 + example[0].y, 2, 0, 360);
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+      } else if (radius > 40) {
+        ctx.strokeStyle = 'grey';
+        ctx.setLineDash([5, 3]);
+        ctx.beginPath();
+        ctx.moveTo(shp.width / 2, shp.height / 2);
+        ctx.lineTo(shp.width / 2 + example[2].x, shp.height / 2 + example[2].y);
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(shp.width / 2, shp.height / 2);
+        ctx.lineTo(shp.width / 2 + example[1].x, shp.height / 2 + example[1].y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.translate((shp.width + example[2].x) / 2, (shp.height + example[2].y) / 2);
+        ctx.rotate(toRad(rot + inc * 2))
+        ctx.fillText('R', 0, 11);
+        ctx.resetTransform();
+
+
+        ctx.beginPath();
+        ctx.arc(shp.width / 2, shp.height / 2, radius / 6, toRad(rot + 360 / sides * 1), toRad(rot + 360 / sides * 2));
+        ctx.stroke();
+
+        ctx.translate(shp.width / 2, shp.height / 2);
+        ctx.rotate(toRad(rot + inc * 1.5))
+        ctx.fillText('θ', radius / 3.5, 4);
+        ctx.resetTransform();
+      }
+      ctx.font = "15px Lucida Console";
+      ctx.fillText("θ = n ⋅ 360º/s", shp.width / 2, shp.height - 20);
+      ctx.fillText("x = Rcosθ  y = Rsinθ", shp.width / 2, shp.height - 5);
+    }
+    updateShape();
+
+    /* update Number Value next to the Slider */
+    $('.slider') //select all sliders
+      .each(function () { //run this for each slider
+        //select elements
+        let div = $(this);
+        let input = div.children('input');
+        let span = div.children('span');
+
+        span.text(input[0].value); //update on load
+
+        input.on('input', function () { //when there is new input
+          span.text(this.value); //update the text
+          pols.length = 0;
+        });
+      })
+  </script>
+
+  <!-- Linear Bisector Example -->
+  <script>
+    var prp = document.getElementById('perp');
+    let mouseIsPressedp = false;
+    $(prp).mousedown(() => mouseIsPressedp = true).mouseup(() => mouseIsPressedp = false);
+    let mouseX = 0, mouseY = 0;
+    $(prp).mousemove(function (e) {
+      let m = mouse(this, e);
+      mouseX = m.x;
+      mouseY = m.y;
+    })
+    var line = [50, prp.height / 2, 150, prp.height / 2];
+    var dragging;
+    function updatePerp() {
+      let ctx = prp.getContext('2d');
+      ctx.clearRect(0, 0, prp.width, prp.height);
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = 'grey';
+      ctx.beginPath();
+      ctx.arc(line[0], line[1], radius * 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(line[2], line[3], radius * 2, 0, Math.PI * 2);
+      ctx.stroke();
+
+      let angle = Math.atan2(line[1] - line[3], line[0] - line[2]) + Math.PI / 2;
+      let mx = (line[0] + line[2]) / 2;
+      let my = (line[1] + line[3]) / 2;
+      ctx.beginPath();
+      ctx.moveTo(mx + Math.cos(angle) * 300, my + Math.sin(angle) * 300);
+      angle += Math.PI;
+      ctx.lineTo(mx + Math.cos(angle) * 300, my + Math.sin(angle) * 300);
+      ctx.closePath();
+      ctx.strokeStyle = 'lightpink';
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(mx, my, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'lightblue';
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.moveTo(line[0], line[1]);
+      ctx.lineTo(line[2], line[3]);
+      ctx.closePath();
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+
+      ctx.fillStyle = 'blue';
+      ctx.beginPath();
+      ctx.arc(mx + Math.cos(angle) * radius, my + Math.sin(angle) * radius, radius / 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(mx + Math.cos(angle + Math.PI) * radius, my + Math.sin(angle + Math.PI) * radius, radius / 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = "15px Lucida Console";
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'black';
+      if (frameCount / 3 % 200 < 100) {
+        ctx.fillText('Drag the ends', prp.width / 2, prp.height - 20);
+        ctx.fillText('of the line segment', prp.width / 2, prp.height - 5);
+      } else if (frameCount / 3 % 200 < 150) {
+        ctx.fillText('The blue dots are', prp.width / 2, prp.height - 20);
+        ctx.fillText('the next possible locations', prp.width / 2, prp.height - 5);
+      } else {
+        ctx.fillText('This is the same as a', prp.width / 2, prp.height - 20);
+        ctx.fillText('reflection over a side', prp.width / 2, prp.height - 5);
+      }
+
+      /* Dragging */
+      if (mouseIsPressedp && dist(line[0], line[1], mouseX, mouseY) < 15) dragging = 0;
+      if (mouseIsPressedp && dist(line[2], line[3], mouseX, mouseY) < 15) dragging = 2;
+      if (dragging !== undefined) {
+        line[dragging] = mouseX;
+        line[dragging + 1] = mouseY;
+      }
+      if (!mouseIsPressedp) dragging = undefined;
+
+      /* Rigidity of the Segment */
+      let closest = dist(prp.width / 2, prp.height / 2, line[0], line[1]) > dist(prp.width / 2, prp.height / 2, line[2], line[3]) ? 2 : 0;
+      let furthest = dist(prp.width / 2, prp.height / 2, line[0], line[1]) < dist(prp.width / 2, prp.height / 2, line[2], line[3]) ? 2 : 0;
+      while (Math.abs(dist.apply(this, line) - (radius * 2)) > 2) {
+        if (dist.apply(this, line) > (radius * 2)) {
+          if (furthest === 2) angle = Math.atan2(line[3] - line[1], line[2] - line[0]);
+          else angle = Math.atan2(line[1] - line[3], line[0] - line[2]);
+          line[furthest] -= Math.cos(angle);
+          line[furthest + 1] -= Math.sin(angle);
+        } else {
+          if (closest === 2) angle = Math.atan2(line[3] - line[1], line[2] - line[0]);
+          else angle = Math.atan2(line[1] - line[3], line[0] - line[2]);
+          line[closest] += Math.cos(angle);
+          line[closest + 1] += Math.sin(angle);
+        }
+      }
+    }
+  </script>
+
+  <script>
+
+    var prl = document.getElementById('perli');
+    function updatePerl() {
+      let ctx = prl.getContext('2d');
+      ctx.resetTransform();
+
+      ctx.clearRect(0, 0, prl.width, prl.height);
+      ctx.font = '15px Lucida Console';
+      ctx.fillStyle = 'red';
+      ctx.textAlign = 'center';
+      ctx.fillText('< sorry, I ran out of time ;-; >', prl.width / 2, prl.height / 2);
+    }
+  </script>
+
+
+  <!-- Result -->
+  <script>
+    var time = 100;
+    function bisector(x1, y1, x2, y2, d) {
+      let mx = (x2 + x1) / 2, my = (y2 + y1) / 2;
+      let angle = Math.atan2(y1 - y2, x1 - x2) + Math.PI / 2;
+      return { x: mx + Math.cos(angle) * d, y: my + Math.sin(angle) * d };
+    }
+    function check(x, y, ctx) {
+      return ctx.getImageData(x, y, 1, 1).data[3] === 0;
+    }
+
+    var env = document.getElementById('env');
+    var pols = [], minRad;
+    var Polygon = function (x, y, theta) {
+      this.shape = polygon(x, y, radius, sides, theta);
+      this.created = Date.now();
+      this.done = x < 0 || x > env.width || y < 0 || y > env.height;
+      this.theta = theta;
+      if (!minRad) minRad = dist(x, y, (this.shape[0].x + this.shape[1].x) / 2, (this.shape[0].y + this.shape[1].y) / 2);
+    };
+    Polygon.prototype.draw = function (ctx) {
+      shape(this.shape, ctx);
+    };
+    Polygon.prototype.spawn = function (ctx) {
+      if (this.done || Date.now() - this.created < time) return;
+      for (var i = 0, b, n; i < this.shape.length; i++) {
+        n = (i + 1) % this.shape.length;
+        b = bisector(this.shape[i].x, this.shape[i].y, this.shape[n].x, this.shape[n].y, minRad);
+        if (check(b.x, b.y, ctx)) pols.push(new Polygon(b.x, b.y, this.theta - 180));
+      }
+      this.done = true;
+    };
+
+    $(env).click(function (e) {
+      let m = mouse(this, e);
+      pols.length = 0;
+      minRad = undefined;
+      pols.push(new Polygon(m.x, m.y, Math.random() * 360));
+    })
+    let ctx = env.getContext('2d');
+    function update() {
+      ctx.clearRect(0, 0, env.width, env.height);
+      for (var i = 0; i < pols.length; i++) {
+        pols[i].draw(ctx);
+        let a = (Date.now() - pols[i].created) / time;
+        ctx.fillStyle = `rgba(200, 200, 255, ${a})`;
+        ctx.strokeStyle = `rgba(0, 0, 255, ${a})`;
+        ctx.fill();
+        ctx.stroke();
+      }
+      pols.forEach(e => e.spawn(ctx));
+      if (!pols.length) {
+        ctx.font = '25px Lucida Console';
+        ctx.textAlign = 'center';
+        ctx.fillText('*click*', env.width / 2, env.height / 2);
+      }
+    }
+  </script>
+
+  <script>
+    function draw() {
+      frameCount++;
+      updateShape();
+      updatePerp();
+      updatePerl();
+      update();
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  </script>
+</body>
+
+</html>
